@@ -21,8 +21,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
-
       # Pas de script gradlew dans le dépôt : on utilise la version du wrapper (8.13)
       - uses: gradle/actions/setup-gradle@v4
         with:
