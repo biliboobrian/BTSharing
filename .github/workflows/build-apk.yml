@@ -18,16 +18,14 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          # Le démon Gradle exige un JDK 21 JetBrains (gradle/gradle-daemon-jvm.properties)
+          distribution: jetbrains
           java-version: 21
 
-      # Pas de script gradlew dans le dépôt : on utilise la version du wrapper (8.13)
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.13"
 
       - name: Build APK
-        run: gradle --no-daemon assembleRelease
+        run: ./gradlew --no-daemon assembleRelease
 
       - name: Rename APK
         run: |
