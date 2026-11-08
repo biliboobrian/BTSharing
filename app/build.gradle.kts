@@ -18,8 +18,10 @@ android {
 
     buildTypes {
         release {
-            // Beaucoup de réflexion / API cachées : on ne minifie pas.
-            isMinifyEnabled = false
+            // Réduit les bibliothèques ; le code de l'app est gardé (voir proguard-rules.pro)
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
     }
