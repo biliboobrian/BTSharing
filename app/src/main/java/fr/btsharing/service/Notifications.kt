@@ -55,7 +55,7 @@ object Notifications {
         val n = NotificationCompat.Builder(context, CHANNEL_ACTION)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Activer le partage de connexion")
-            .setContentText("${mode.label} : appuyez pour l'activer (configurez Shizuku pour l'automatiser).")
+            .setContentText("${mode.label} : appuyez pour l'activer (ouvrez BTSharing pour l'automatiser).")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pi)
