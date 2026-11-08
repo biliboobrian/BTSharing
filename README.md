@@ -11,21 +11,19 @@ quand un appareil Bluetooth approuvé se connecte au téléphone, et le coupe qu
 
 Android 11 minimum.
 
-## Pourquoi Shizuku ?
+## Comment le partage est activé
 
-Depuis Android 8, seules les applications système peuvent activer le partage de connexion.
-[Shizuku](https://shizuku.rikka.app/) (gratuit, open source, **sans root**) donne à BTSharing
-les droits « ADB » nécessaires :
+1. **Méthode directe (par défaut, sans Shizuku ni root)** : BTSharing demande l'autorisation
+   *« Modifier les paramètres système »*. Avec elle, le service système de partage de connexion
+   (Android 11+) accepte d'activer le point d'accès Wi‑Fi ou le partage Bluetooth. Elle s'accorde
+   une seule fois et **reste après un redémarrage**.
+2. **Shizuku (secours)** : seulement si Android refuse la méthode directe — typiquement quand
+   l'opérateur impose une vérification d'abonnement avant le partage. BTSharing ne propose alors
+   Shizuku que dans ce cas. S'il tourne déjà, il est utilisé automatiquement.
+3. **Notification** : si rien ne marche, elle ouvre l'écran de partage de connexion en un geste.
 
-1. Installer Shizuku (Play Store).
-2. Options pour les développeurs → activer **Débogage sans fil**.
-3. Dans Shizuku : *Démarrer via le débogage sans fil* (appairage une seule fois).
-4. Dans BTSharing : accepter la demande d'autorisation Shizuku.
-
-Shizuku doit être redémarré après chaque redémarrage du téléphone (sauf avec root / Sui).
-
-Sans Shizuku : le partage **Bluetooth** peut encore fonctionner sur Android 11. Sinon, une
-notification propose d'ouvrir l'écran de partage de connexion en un seul geste.
+Diagnostic : `adb logcat -s TetherController DirectTethering`
+(`Direct … -> 0` = succès, `14` ou `11` = refus opérateur/constructeur).
 
 ## Réglages proposés automatiquement
 
@@ -34,7 +32,8 @@ Au lancement, l'application propose un par un les réglages manquants (et les ga
 | Réglage | Effet |
 |---|---|
 | Autorisations Bluetooth + notifications | détecter les appareils, service permanent |
-| Shizuku | activer le partage sans intervention |
+| Modifier les paramètres système | activer le partage sans intervention |
+| Shizuku (uniquement si la méthode directe est refusée) | idem, via les droits ADB |
 | Ignorer l'optimisation de batterie | actif écran éteint / en économie d'énergie, Doze |
 | Batterie « Non restreinte » | pas de restriction en arrière-plan |
 | Ne pas suspendre l'appli inutilisée | pas de retrait des autorisations |
@@ -56,6 +55,6 @@ Le partage n'est coupé à la déconnexion que si c'est BTSharing qui l'avait ac
 
 - Le mode **Bluetooth** suppose que l'appareil connecté accepte le partage Bluetooth (PAN) :
   tablettes, PC, certains autoradios. Sinon, choisir **Point d'accès Wi‑Fi**.
-- L'appel Shizuku repose sur une interface système non publique (`ITetheringConnector`) ;
-  un constructeur ou une future version d'Android peut la modifier. En cas d'échec,
+- Les deux méthodes reposent sur des API système non publiques (`TetheringManager`,
+  `ITetheringConnector`) ; un constructeur ou une future version d'Android peut les modifier. En cas d'échec,
   la notification de secours prend le relais (voir `adb logcat -s TetherController`).

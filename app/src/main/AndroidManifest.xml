@@ -16,6 +16,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- « Modifier les paramètres système » : suffit pour piloter le partage de connexion (sans Shizuku) -->
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- Rester actif en permanence -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

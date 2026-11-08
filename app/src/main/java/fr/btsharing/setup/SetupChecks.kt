@@ -13,9 +13,11 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import fr.btsharing.data.DeviceRepository
+import fr.btsharing.tether.DirectTethering
 import fr.btsharing.tether.ShizukuHelper
+import fr.btsharing.tether.TetherController
 
-enum class StepId { PERMISSIONS, SHIZUKU, BATTERY, BACKGROUND, UNUSED_APP, OEM }
+enum class StepId { PERMISSIONS, WRITE_SETTINGS, SHIZUKU, BATTERY, BACKGROUND, UNUSED_APP, OEM }
 
 data class SetupStep(val id: StepId, val title: String, val text: String, val button: String)
 
@@ -48,12 +50,22 @@ object SetupChecks {
             ),
         )
 
-        when (ShizukuHelper.status(context)) {
+        if (!DirectTethering.canWriteSettings(context)) add(
+            SetupStep(
+                StepId.WRITE_SETTINGS, "Autoriser la modification des paramètres système",
+                "Permet à BTSharing d'activer lui-même le partage de connexion, sans Shizuku ni root. " +
+                    "À accorder une seule fois : l'autorisation reste après un redémarrage.",
+                "Autoriser",
+            ),
+        )
+
+        // Shizuku n'est proposé que si Android a refusé la méthode directe (vérification opérateur…).
+        if (DeviceRepository.flag(TetherController.FLAG_DIRECT_REFUSED)) when (ShizukuHelper.status(context)) {
             ShizukuHelper.Status.NOT_INSTALLED -> add(
                 SetupStep(
                     StepId.SHIZUKU, "Installer Shizuku",
-                    "Android réserve l'activation du partage de connexion aux applications système. " +
-                        "Shizuku (gratuit, sans root) donne ce droit à BTSharing.",
+                    "Votre téléphone ou votre opérateur refuse l'activation directe du partage de connexion. " +
+                        "Shizuku (gratuit, sans root) donne à BTSharing les droits nécessaires.",
                     "Installer",
                 ),
             )
@@ -118,6 +130,7 @@ object SetupChecks {
         val pkgUri = Uri.fromParts("package", context.packageName, null)
         val intent = when (step) {
             StepId.PERMISSIONS -> return
+            StepId.WRITE_SETTINGS -> Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, pkgUri)
             StepId.SHIZUKU -> return ShizukuHelper.resolve(context)
             StepId.BATTERY -> Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, pkgUri)
             StepId.BACKGROUND -> Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, pkgUri)
